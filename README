@@ -1,0 +1,49 @@
+#############################################
+#### ILLUMINA FASTQ FILES CONCATENATION #####
+#############################################
+Author: smonzon
+Organization:Bioinformatics Unit. ISCIII
+
+# Usage
+# 1. concat_lanes.sh
+concat_lanes <source_dir> <dest_dir>
+
+concat_lanes generates a file merge_reads_by_sample.sh which contains the executable command for all the samples.
+
+
+#2. merge_reads_by_sample.sh
+chmod +x merge_reads_by_sample.sh
+qsub ./merge_reads_by_sample.sh
+
+Generates the concatenated files and calculates md5sum for each one, using dest_dir as output dir.
+SGE is used for running an array job with all the samples in parallel with openmp parallel environment.  
+
+# Source dir organization
+Source directory must be a folder with the next organization:
+	- source_dir
+		-sample1_SX_LXXX_R1.001.fastq.gz
+		-sample1_SX_LXXX_R1.001.fastq.gz
+		-sample1_SX_LXXX_R1.001.fastq.gz
+        -sample1_SX_LXXX_R2.001.fastq.gz
+        -sample1_SX_LXXX_R2.001.fastq.gz
+        -sample2_SX_LXXX_R2.001.fastq.gz
+ 		-sample2_SX_LXXX_R2.001.fastq.gz
+ 		-.....
+
+Script will use "samplex" as name for the concatenated files.
+
+# Use with SGE and SCRATH FOLDER.
+Usage is equal, but the process includes:
+ 1. Copy fastq files to /scrath partition in the execution node. A folder named concat_$RANDOMNUMBER is created, and files are copied into it.
+ 2. Concatenation of files and generation of md5sum in /scratch folder.
+ 3. The output files are copied back to /processing_Data NFS share.
+ 4. concat_$RANDOMNUMBER folder is deleted from /scrath.
+
+
+# Accesory Script: check_concat.sh
+check_concat.sh <source_dir> <dest_dir>
+
+Experience has shown that sometimes the concatenation process fails. Consequently check_concat.sh script has been developed.
+This is a simple script than counts how many lines are in lanes files in source_dir and the number of lines in the concatenated file in dest_dir. 
+If the number match, the output shows a success note, else it shows a fail note.
+

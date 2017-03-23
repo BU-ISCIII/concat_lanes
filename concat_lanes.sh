@@ -21,7 +21,7 @@ else
 	fi
 	
 	## Read samples names. Folder structure MUST be: sourcedir(father)/sample-xxxx. sample is read.
-	find $sourcedir -mindepth 1 -type f -exec sh -c "basename {} | cut -d '_' -f 1" \; | sort -u > samples_id.txt
+	find $sourcedir -maxdepth 1 -not -name "*.md5" -type f -exec sh -c "basename {} | cut -d '_' -f 1" \; | sort -u > samples_id.txt
 	
 	## Generate merge_reads_by_sample.sh script. One order per sample is written. Merge for R1 and R2 is done and output is redirected to destdir.
 	echo '#!/bin/bash' > merge_reads_by_sample.sh
